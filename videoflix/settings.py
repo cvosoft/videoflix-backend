@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'userauth_app',
     'profiles_app',
     'videos_app.apps.VideosAppConfig',
-    'debug_toolbar'
+    'debug_toolbar',
+    'django-rq',
 ]
 
 MIDDLEWARE = [
