@@ -56,6 +56,11 @@ INSTALLED_APPS = [
     #    'django_rq',  mittelfristig
 ]
 
+ACCOUNT_SIGNUP_FIELDS = {'email*', 'username', 'password1', 'password2'}
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+
 SITE_ID = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -80,10 +85,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'videoflix.urls'
 
+DEFAULT_FROM_EMAIL = 'noreply@predigtflix.de'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,6 +101,14 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'

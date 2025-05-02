@@ -1,0 +1,8 @@
+Hallo {{ user.username }},
+
+bitte bestätige deine E-Mail-Adresse, indem du auf den folgenden Link klickst:
+
+{{ activate_url }}
+
+Vielen Dank,
+Dein Predigtflix-Team
