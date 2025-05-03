@@ -4,7 +4,8 @@ from rest_framework.permissions import AllowAny
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
-
+from dj_rest_auth.views import PasswordResetView
+from videoflix.serializers import CustomPasswordResetSerializer
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PublicConfirmEmailView(APIView):
@@ -21,3 +22,7 @@ class PublicConfirmEmailView(APIView):
         except Exception as e:
             print("❌ Fehler bei Bestätigung:", e)
             return Response({"detail": "Ungültiger oder abgelaufener Schlüssel."}, status=400)
+
+
+class CustomPasswordResetView(PasswordResetView):
+    serializer_class = CustomPasswordResetSerializer

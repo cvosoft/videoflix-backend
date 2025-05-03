@@ -62,6 +62,13 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_ADAPTER = 'videoflix.adapters.MyAccountAdapter'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
+DJ_REST_AUTH = {
+    'PASSWORD_RESET_URL_GENERATOR': 'videoflix.adapters.my_password_reset_url_generator',
+    'SERIALIZERS': {
+        'PASSWORD_RESET': 'videoflix.serializers.CustomPasswordResetSerializer',
+    }
+}
+
 
 SITE_ID = 1
 

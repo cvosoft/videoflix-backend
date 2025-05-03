@@ -20,16 +20,31 @@ from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
 from .views import PublicConfirmEmailView
+from django.contrib.auth import views as auth_views
+from .views import PublicConfirmEmailView, CustomPasswordResetView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # login/logout/password reset etc.
-    path('api/', include('dj_rest_auth.urls')),
-    # Registrierung
-    path('api/registration/', include('dj_rest_auth.registration.urls'),),
-    # path('api/account/', include('allauth.account.urls')),
+
+    # ⚠️ Nur Registration getrennt einbinden
+    path('api/registration/', include('dj_rest_auth.registration.urls')),
+
+    # ✅ Custom password reset
+    path('api/password/reset/', CustomPasswordResetView.as_view(),
+         name='rest_password_reset'),
+
+    # ✅ Weitere Auth-Endpunkte (außer reset)
+    path('api/login/', include('dj_rest_auth.urls')),  # nur login/logout/etc.
+
     path('api/confirm-email/', PublicConfirmEmailView.as_view()),
+
+    path(
+        'password-reset-confirm/<uidb64>/<token>/',
+        auth_views.PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'
+    ),
+
 ] + debug_toolbar_urls()
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
