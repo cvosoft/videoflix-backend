@@ -19,12 +19,17 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
+from .views import PublicConfirmEmailView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('dj_rest_auth.urls')),  # login/logout/password reset etc.
-    path('api/registration/', include('dj_rest_auth.registration.urls')),  # Registrierung    
+    # login/logout/password reset etc.
+    path('api/', include('dj_rest_auth.urls')),
+    # Registrierung
+    path('api/registration/', include('dj_rest_auth.registration.urls')),
+    #path('api/account/', include('allauth.account.urls')),
+    path('api/confirm-email/', PublicConfirmEmailView.as_view()),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

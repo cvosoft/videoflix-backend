@@ -59,6 +59,8 @@ INSTALLED_APPS = [
 ACCOUNT_SIGNUP_FIELDS = {'email*', 'username', 'password1', 'password2'}
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_ADAPTER = 'videoflix.adapters.MyAccountAdapter'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
 
 SITE_ID = 1
@@ -81,6 +83,11 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 # ["http://127.0.0.1:5500",]  # Beispiel für eine Live Server Extension in VS Code
+
+# Speziell für dj-rest-auth / allauth:
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:4200",
+]
 
 
 ROOT_URLCONF = 'videoflix.urls'
