@@ -27,8 +27,8 @@ urlpatterns = [
     # login/logout/password reset etc.
     path('api/', include('dj_rest_auth.urls')),
     # Registrierung
-    path('api/registration/', include('dj_rest_auth.registration.urls')),
-    #path('api/account/', include('allauth.account.urls')),
+    path('api/registration/', include('dj_rest_auth.registration.urls'),),
+    # path('api/account/', include('allauth.account.urls')),
     path('api/confirm-email/', PublicConfirmEmailView.as_view()),
 ] + debug_toolbar_urls()
 
