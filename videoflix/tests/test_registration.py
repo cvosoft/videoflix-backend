@@ -8,7 +8,6 @@ class RegistrationTests(APITestCase):
     def test_registration_success(self):
         url = reverse('rest_register')
         data = {
-            "username": "exampleUsername",
             "email": "example@mail.de",
             "password1": "examplePassword",
             "password2": "examplePassword",
@@ -28,7 +27,6 @@ class RegistrationTests(APITestCase):
             "email": "sdffdsgds",
             "password": "pass",
             "repeated_password": "passwort123",
-            "type": "dfbbfdbfd"
         }
         response = self.client.post(url, data, format="json")
 

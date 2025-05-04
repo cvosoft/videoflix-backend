@@ -9,6 +9,8 @@ class MyAccountAdapter(DefaultAccountAdapter):
 
     def get_password_reset_url(self, user, token):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
+        print(">>> UID:", uid)
+        print(">>> Token:", token)
         return f"http://127.0.0.1:4200/reset-password/{uid}/{token}/"
 
 

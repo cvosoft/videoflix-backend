@@ -69,6 +69,9 @@ DJ_REST_AUTH = {
     }
 }
 
+DJRESTAUTH_PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}/'
+DJRESTAUTH_PASSWORD_RESET_CONFIRM_PATH = '/api/login/password/reset/confirm/'  # <<< wichtig!
+
 
 SITE_ID = 1
 

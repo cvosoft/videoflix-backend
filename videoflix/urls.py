@@ -23,6 +23,14 @@ from .views import PublicConfirmEmailView
 from django.contrib.auth import views as auth_views
 from .views import PublicConfirmEmailView, CustomPasswordResetView
 
+# welche Endpoints brauche ich?
+# POST: Login (email, passwort)
+# POST: Logout ()
+# POST: Register (email, passwort1, passwort2)
+# POST: ForgotPW (email)
+# POST: ResetPW (passwort1, passwort2)
+# POST: confirm-email (nichts!)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,18 +39,19 @@ urlpatterns = [
     path('api/registration/', include('dj_rest_auth.registration.urls')),
 
     # ✅ Custom password reset
-    path('api/password/reset/', CustomPasswordResetView.as_view(),
+    path('api/password/reset', CustomPasswordResetView.as_view(),
          name='rest_password_reset'),
 
-    # ✅ Weitere Auth-Endpunkte (außer reset)
-    path('api/login/', include('dj_rest_auth.urls')),  # nur login/logout/etc.
+    # ✅ Weitere Auth-Endpunkte (außer reset) (ACHTUNG WAR AUF api/login/!)
+    # api oder api/login
+    path('api/', include('dj_rest_auth.urls')),  # nur login/logout/etc.
 
     path('api/confirm-email/', PublicConfirmEmailView.as_view()),
 
     path(
         'password-reset-confirm/<uidb64>/<token>/',
         auth_views.PasswordResetConfirmView.as_view(),
-        name='password_reset_confirm'
+        name='rest_password_reset_confirm'
     ),
 
 ] + debug_toolbar_urls()
