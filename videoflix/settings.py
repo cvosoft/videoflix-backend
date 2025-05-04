@@ -10,8 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
+#https://github.com/celiao/django-rest-authemail!!!!
+
 import os
+from pathlib import Path
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='dj_rest_auth')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,13 +69,15 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 
 DJ_REST_AUTH = {
     'PASSWORD_RESET_URL_GENERATOR': 'videoflix.adapters.my_password_reset_url_generator',
+    "PASSWORD_RESET_CONFIRM_SERIALIZER": "videoflix.serializers.CustomPasswordResetConfirmSerializer",
     'SERIALIZERS': {
         'PASSWORD_RESET': 'videoflix.serializers.CustomPasswordResetSerializer',
     }
 }
 
+DJRESTAUTH_PASSWORD_RESET_CONFIRM_PATH = '/api/password/reset/confirm/'
 DJRESTAUTH_PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}/'
-DJRESTAUTH_PASSWORD_RESET_CONFIRM_PATH = '/api/login/password/reset/confirm/'  # <<< wichtig!
+#DJRESTAUTH_PASSWORD_RESET_CONFIRM_PATH = '/api/login/password/reset/confirm/'  # <<< wichtig!
 
 
 SITE_ID = 1

@@ -1,5 +1,5 @@
 # videoflix/serializers.py
-from dj_rest_auth.serializers import PasswordResetSerializer
+from dj_rest_auth.serializers import PasswordResetSerializer, PasswordResetConfirmSerializer
 from django.conf import settings
 from importlib import import_module
 
@@ -15,3 +15,9 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
         return {
             'url_generator': url_generator,
         }
+
+
+class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
+    def validate(self, attrs):
+        print("✅ CustomPasswordResetConfirmSerializer aktiv!")
+        return super().validate(attrs)

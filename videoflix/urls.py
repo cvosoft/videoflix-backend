@@ -22,6 +22,8 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from .views import PublicConfirmEmailView
 from django.contrib.auth import views as auth_views
 from .views import PublicConfirmEmailView, CustomPasswordResetView
+from dj_rest_auth.views import PasswordResetConfirmView
+from videoflix.serializers import CustomPasswordResetConfirmSerializer
 
 # welche Endpoints brauche ich?
 # POST: Login (email, passwort)
@@ -55,5 +57,14 @@ urlpatterns = [
     ),
 
 ] + debug_toolbar_urls()
+
+urlpatterns += [
+    path(
+        'api/password/reset/confirm/',
+        PasswordResetConfirmView.as_view(
+            serializer_class=CustomPasswordResetConfirmSerializer),
+        name='password_reset_confirm_custom'
+    ),
+]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
