@@ -22,18 +22,18 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib.auth import views as auth_views
 
 
-# welche Endpoints brauche ich?
-# POST: Login (email, passwort)
-# POST: Logout ()
-# POST: Register (email, passwort1, passwort2)
-# POST: ForgotPW (email)
-# POST: ResetPW (passwort1, passwort2)
-# POST: confirm-email (nichts!)
-
+# POST	/api/registration/	Registrierung
+# POST	/api/verify/	E-Mail-Bestätigung
+# POST	/api/login/	Login
+# POST	/api/password/reset/	Passwort-Zurücksetzen anfordern
+# POST	/api/password/reset/verify/	Token bestätigen
+# POST	/api/password/reset/confirmed/	Neues Passwort setzen
+# POST	/api/status/	Check Login-Status
+# POST	/api/logout/	Logout
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path('api/', include('authemail.urls')),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

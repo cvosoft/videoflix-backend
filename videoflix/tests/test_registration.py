@@ -6,11 +6,11 @@ from rest_framework import status
 class RegistrationTests(APITestCase):
 
     def test_registration_success(self):
-        url = reverse('rest_register')
+        url = reverse('authemail-signup')
+
         data = {
             "email": "example@mail.de",
-            "password1": "examplePassword",
-            "password2": "examplePassword",
+            "password": "examplePassword",
         }
         response = self.client.post(url, data, format="json")
 
@@ -21,7 +21,7 @@ class RegistrationTests(APITestCase):
 
 
     def test_registration_invalid_data(self):
-        url = reverse('rest_register')
+        url = reverse('authemail-signup')
         data = {
             "username": "",
             "email": "sdffdsgds",

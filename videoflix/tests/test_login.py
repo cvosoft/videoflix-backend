@@ -1,34 +1,49 @@
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from rest_framework import status
-from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
+from django.core import mail
+import re
 
 
 class LoginTests(APITestCase):
 
     def setUp(self):
-        self.User = get_user_model()
+
         self.email = "testuser@example.com"
         self.password = "OldPassword123!"
-        self.user = self.User.objects.create_user(
-            username=self.email,
-            email=self.email,
-            password=self.password,
-            is_active=True  # wichtig!
-        )
+
+        url = reverse('authemail-signup')
+
+        data = {
+            "email": self.email,
+            "password": self.password
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # 👇 E-Mail abfangen
+        self.assertEqual(len(mail.outbox), 1)
+        email_body = mail.outbox[0].body
+
+        # 👇 Code per Regex extrahieren
+        match = re.search(r'code[=: ]+(\w+)', email_body, re.IGNORECASE)
+        self.assertIsNotNone(
+            match, "Kein Verification Code in E-Mail gefunden")
+        self.verification_code = match.group(1)
 
     def test_login_success(self):
 
-        # 👇 Markiere E-Mail-Adresse als verifiziert
-        EmailAddress.objects.create(
-            user=self.user,
-            email=self.email,
-            verified=True,
-            primary=True
-        )
+        # verify first
+        # 👇 Bestätigungsrequest absenden
+        url = reverse('authemail-signup-verify')
+        response = self.client.get(url, {
+            "email": self.email,
+            "code": self.verification_code
+        }, format="json")
+        self.assertEqual(response.status_code, 200)
 
-        url = reverse('rest_login')
+        url = reverse('authemail-login')
         data = {
             "email": self.email,
             "password": self.password,
@@ -41,12 +56,11 @@ class LoginTests(APITestCase):
 
     def test_login_not_verified(self):
 
-        url = reverse('rest_login')
+        url = reverse('authemail-login')
         data = {
             "email": self.email,
             "password": self.password,
         }
         response = self.client.post(url, data, format="json")
 
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
