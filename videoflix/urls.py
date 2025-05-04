@@ -19,11 +19,8 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
-from .views import PublicConfirmEmailView
 from django.contrib.auth import views as auth_views
-from .views import PublicConfirmEmailView, CustomPasswordResetView
-from dj_rest_auth.views import PasswordResetConfirmView
-from videoflix.serializers import CustomPasswordResetConfirmSerializer
+
 
 # welche Endpoints brauche ich?
 # POST: Login (email, passwort)
@@ -37,34 +34,6 @@ from videoflix.serializers import CustomPasswordResetConfirmSerializer
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # ⚠️ Nur Registration getrennt einbinden
-    path('api/registration/', include('dj_rest_auth.registration.urls')),
-
-    # ✅ Custom password reset
-    path('api/password/reset', CustomPasswordResetView.as_view(),
-         name='rest_password_reset'),
-
-    # ✅ Weitere Auth-Endpunkte (außer reset) (ACHTUNG WAR AUF api/login/!)
-    # api oder api/login
-    path('api/', include('dj_rest_auth.urls')),  # nur login/logout/etc.
-
-    path('api/confirm-email/', PublicConfirmEmailView.as_view()),
-
-    path(
-        'password-reset-confirm/<uidb64>/<token>/',
-        auth_views.PasswordResetConfirmView.as_view(),
-        name='rest_password_reset_confirm'
-    ),
-
 ] + debug_toolbar_urls()
-
-urlpatterns += [
-    path(
-        'api/password/reset/confirm/',
-        PasswordResetConfirmView.as_view(
-            serializer_class=CustomPasswordResetConfirmSerializer),
-        name='password_reset_confirm_custom'
-    ),
-]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

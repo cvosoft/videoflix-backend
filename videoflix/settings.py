@@ -14,8 +14,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning, module='dj_rest_auth')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,37 +46,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'allauth',
-    'allauth.account',
+
     'rest_framework',
     'rest_framework.authtoken',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
+	'authemail',
+	'accounts',
+
     'django_filters',
     'videos_app.apps.VideosAppConfig',
     'debug_toolbar',
-    'allauth.socialaccount',
     #    'django_rq',  mittelfristig
 ]
 
-ACCOUNT_SIGNUP_FIELDS = {'email*', 'username', 'password1', 'password2'}
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_ADAPTER = 'videoflix.adapters.MyAccountAdapter'
-ACCOUNT_CONFIRM_EMAIL_ON_GET = False
-
-DJ_REST_AUTH = {
-    'PASSWORD_RESET_URL_GENERATOR': 'videoflix.adapters.my_password_reset_url_generator',
-    "PASSWORD_RESET_CONFIRM_SERIALIZER": "videoflix.serializers.CustomPasswordResetConfirmSerializer",
-    'SERIALIZERS': {
-        'PASSWORD_RESET': 'videoflix.serializers.CustomPasswordResetSerializer',
-    }
-}
-
-DJRESTAUTH_PASSWORD_RESET_CONFIRM_PATH = '/api/password/reset/confirm/'
-DJRESTAUTH_PASSWORD_RESET_CONFIRM_URL = 'reset-password/{uid}/{token}/'
-#DJRESTAUTH_PASSWORD_RESET_CONFIRM_PATH = '/api/login/password/reset/confirm/'  # <<< wichtig!
-
+AUTH_USER_MODEL = 'accounts.MyUser'
 
 SITE_ID = 1
 
@@ -87,7 +67,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -95,7 +74,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -131,8 +109,6 @@ AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
 
-    # `allauth` specific authentication methods, such as login by email
-    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
