@@ -22,15 +22,6 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib.auth import views as auth_views
 
 
-# POST	/api/registration/	Registrierung
-# POST	/api/verify/	E-Mail-Bestätigung
-# POST	/api/login/	Login
-# POST	/api/password/reset/	Passwort-Zurücksetzen anfordern
-# POST	/api/password/reset/verify/	Token bestätigen
-# POST	/api/password/reset/confirmed/	Neues Passwort setzen
-# POST	/api/status/	Check Login-Status
-# POST	/api/logout/	Logout
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('authemail.urls')),
