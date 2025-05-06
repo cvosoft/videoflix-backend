@@ -20,10 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib.auth import views as auth_views
+from accounts.views import CustomLoginView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # eigene View wegen Fehlerverschleierung!!
+    path('api/login/', CustomLoginView.as_view(), name='rest_auth_login'),
     path('api/', include('authemail.urls')),
     path('api/', include('videos_app.api.urls')),
 ] + debug_toolbar_urls()

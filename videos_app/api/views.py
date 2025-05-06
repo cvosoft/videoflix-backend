@@ -2,11 +2,11 @@
 from rest_framework import viewsets
 from videos_app.models import Video, VideoSeries
 from .serializers import SerieSerializer, PredigtSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class SerieViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]  # 👈 das erlaubt öffentlichen Zugriff
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = VideoSeries.objects.all()
     serializer_class = SerieSerializer
 
