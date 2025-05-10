@@ -11,12 +11,14 @@ class VideoSeries(models.Model):
 
 
 class Video(models.Model):
-    serie = models.ForeignKey(VideoSeries, related_name='predigten', on_delete=models.CASCADE, default=1)
+    serie = models.ForeignKey(
+        VideoSeries, related_name='predigten', on_delete=models.CASCADE, default=1)
     created_at = models.DateField(default=date.today)
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=500)
     video_file = models.FileField(upload_to='videos/', blank=True, null=True)
-    
-    
+    thumbnail_file = models.FileField(
+        upload_to='thumbs/', blank=True, null=True, default="")
+
     def __str__(self):
         return f"{self.serie.title} – {self.title}"
