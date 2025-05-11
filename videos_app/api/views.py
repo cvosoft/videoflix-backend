@@ -12,5 +12,6 @@ class SerieViewSet(viewsets.ModelViewSet):
 
 
 class PredigtViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Video.objects.all()
     serializer_class = PredigtSerializer
