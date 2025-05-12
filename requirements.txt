@@ -11,6 +11,8 @@ django-redis==5.4.0
 django-rest-authemail==2.1.7
 django-rq==3.0.0
 djangorestframework==3.16.0
+ffmpeg-python==0.2.0
+future==1.0.0
 idna==3.10
 python-decouple==3.8
 python-ipware==3.0.0
