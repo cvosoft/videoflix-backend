@@ -5,7 +5,7 @@ from videos_app.models import Video, VideoSeries
 
 
 class PredigtSerializer(serializers.ModelSerializer):
-    serie_title = serializers.CharField(source='serie.title', read_only=True)
+    series_title = serializers.CharField(source='serie.title', read_only=True)
 
     class Meta:
         model = Video
