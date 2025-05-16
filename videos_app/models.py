@@ -16,9 +16,10 @@ class Video(models.Model):
     created_at = models.DateField(default=date.today)
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=500)
-    video_file = models.FileField(upload_to='videos/', blank=True, null=True)
+    video_file = models.FileField(
+        upload_to='videos/', max_length=255, blank=True, null=True)
     thumbnail_file = models.FileField(
-        upload_to='thumbs/', blank=True, null=True, default="")
+        upload_to='thumbs/', max_length=255, blank=True, null=True, default="")
 
     def __str__(self):
         return f"{self.serie.title} – {self.title}"
