@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'django_filters',
     'videos_app.apps.VideosAppConfig',
     'debug_toolbar',
-    #    'django_rq',  mittelfristig
+    'django_rq',
 ]
 
 AUTH_USER_MODEL = 'accounts.MyUser'
