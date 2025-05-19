@@ -3,7 +3,7 @@ name: Deploy Videoflix Backend
 on:
   push:
     branches:
-      - master  # Passe an, falls du einen anderen Branch nutzt
+      - master  # Passe ggf. an
 
 jobs:
   deploy:
@@ -19,19 +19,22 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY_VIDEOFLIX }}
 
-      - name: Deploy via rsyncc
+      - name: Deploy via rsync
         run: |
           rsync -avz \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ christoph@v2202411136713300836.megasrv.de:/home/christoph/backends/videoflix-backend/
 
+      - name: Write .env file on server
+        run: |
+          ssh -o StrictHostKeyChecking=no christoph@v2202411136713300836.megasrv.de "printf '%s\n' '${{ secrets.DOTENV_PROD }}' > /home/christoph/backends/videoflix-backend/.env"
+
       - name: Run remote deploy tasks
         run: |
           ssh -o StrictHostKeyChecking=no christoph@v2202411136713300836.megasrv.de << 'EOF'
             cd /home/christoph/backends/videoflix-backend
-            source venv/bin/activate
-            pip install -r requirements.txt
-            python manage.py migrate --noinput
-            python manage.py collectstatic --noinput
-            supervisorctl restart videoflix-gunicorn
+            /home/christoph/backends/videoflix-backend/venv/bin/pip install -r requirements.txt
+            /home/christoph/backends/videoflix-backend/venv/bin/python manage.py migrate --noinput
+            /home/christoph/backends/videoflix-backend/venv/bin/python manage.py collectstatic --noinput
+            sudo supervisorctl restart videoflix-gunicorn
           EOF
