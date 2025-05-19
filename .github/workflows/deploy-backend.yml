@@ -19,7 +19,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY_VIDEOFLIX }}
 
-      - name: Deploy via rsync
+      - name: Deploy via rsyncc
         run: |
           rsync -avz \
             -e "ssh -o StrictHostKeyChecking=no" \
