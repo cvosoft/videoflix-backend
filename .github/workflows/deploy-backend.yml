@@ -1,0 +1,37 @@
+name: Deploy Videoflix Backend
+
+on:
+  push:
+    branches:
+      - main  # Passe an, falls du einen anderen Branch nutzt
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY_VIDEOFLIX }}
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ christoph@v2202411136713300836.megasrv.de:/home/christoph/backends/videoflix-backend/
+
+      - name: Run remote deploy tasks
+        run: |
+          ssh -o StrictHostKeyChecking=no christoph@v2202411136713300836.megasrv.de << 'EOF'
+            cd /home/christoph/backends/videoflix-backend
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput
+            supervisorctl restart videoflix-gunicorn
+          EOF
