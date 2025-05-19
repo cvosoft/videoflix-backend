@@ -214,3 +214,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
+RQ_QUEUES = {
+    'default': {
+        'URL': 'redis://:foobared@127.0.0.1:6379/0',
+        'DEFAULT_TIMEOUT': 360,
+    }
+}
