@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 # https://github.com/celiao/django-rest-authemail!!!!
 
 import os
+
+# ÜBERGANGSLÖSUNG WEGEN GROßen UPLOADS!
+os.environ["TMPDIR"] = "/mnt/blockstorage/tmp_uploads"
+
 from pathlib import Path
 from decouple import config
 
