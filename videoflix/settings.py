@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-#https://github.com/celiao/django-rest-authemail!!!!
+# https://github.com/celiao/django-rest-authemail!!!!
 
 import os
 from pathlib import Path
@@ -33,7 +33,7 @@ SECRET_KEY = 'django-insecure-5fqvqd1+62g=5&dlu&tllcqm#(tde&q(m)2$7e(z7pv72o+uj5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.predigtflix.de', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -50,8 +50,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
-	'authemail',
-	'accounts',
+    'authemail',
+    'accounts',
 
     'django_filters',
     'videos_app.apps.VideosAppConfig',
@@ -63,7 +63,7 @@ AUTH_USER_MODEL = 'accounts.MyUser'
 
 SITE_ID = 1
 
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 EMAIL_FROM = config('AUTHEMAIL_DEFAULT_EMAIL_FROM')
