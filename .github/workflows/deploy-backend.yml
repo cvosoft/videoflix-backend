@@ -3,7 +3,7 @@ name: Deploy Videoflix Backend
 on:
   push:
     branches:
-      - main  # Passe an, falls du einen anderen Branch nutzt
+      - master  # Passe an, falls du einen anderen Branch nutzt
 
 jobs:
   deploy:
