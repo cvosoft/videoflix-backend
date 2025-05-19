@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = '/mnt/blockstorage/media'
 MEDIA_URL = '/media/'
+FILE_UPLOAD_TEMP_DIR = '/mnt/blockstorage/tmp_uploads'
 
 
 # Quick-start development settings - unsuitable for production
