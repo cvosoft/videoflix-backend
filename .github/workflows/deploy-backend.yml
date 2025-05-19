@@ -21,7 +21,7 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -avz --delete \
+          rsync -avz \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ christoph@v2202411136713300836.megasrv.de:/home/christoph/backends/videoflix-backend/
 
