@@ -5,7 +5,8 @@ from django.db.models.signals import post_save, post_delete
 import os
 import shutil
 from pathlib import Path
-
+from .tasks import convert_video_task
+import django_rq
 
 # # Es werden verschiedene Auflösungen (120p, 360p, 720p, 1080p) zur manuellen Auswahl angeboten.
 # @receiver(post_save, sender=Video)
@@ -16,17 +17,26 @@ from pathlib import Path
 #         for res in ['120', '360', '720', '1080']:
 #             convert_to_height_pixels(instance.video_file.path, res)
 
+# ALT!
+# @receiver(post_save, sender=Video)
+# def video_post_save(sender, instance, created, **kwargs):
+#     if created and instance.video_file:
+#         base_output_dir = instance.video_file.path.replace('.mp4', '')
+#         master_path = convert_video_to_hls(
+#             instance.video_file.path, base_output_dir)
+#         # Pfad relativ zu MEDIA_ROOT setzen
+#         relative = Path(master_path).relative_to(
+#             Path(instance.video_file.storage.location))
+#         instance.video_file.name = str(relative)
+#         instance.save(update_fields=["video_file"])
+
+
 @receiver(post_save, sender=Video)
 def video_post_save(sender, instance, created, **kwargs):
     if created and instance.video_file:
-        base_output_dir = instance.video_file.path.replace('.mp4', '')
-        master_path = convert_video_to_hls(
-            instance.video_file.path, base_output_dir)
-        # Pfad relativ zu MEDIA_ROOT setzen
-        relative = Path(master_path).relative_to(
-            Path(instance.video_file.storage.location))
-        instance.video_file.name = str(relative)
-        instance.save(update_fields=["video_file"])
+        queue = django_rq.get_queue('default')
+        queue.enqueue(convert_video_task, instance.id,
+                      instance.video_file.path)
 
 
 @receiver(post_delete, sender=Video)

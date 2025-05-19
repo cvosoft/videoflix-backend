@@ -3,6 +3,21 @@ from pathlib import Path
 import ffmpeg
 import shutil
 import os
+from .models import Video
+
+
+# das ist neu für rq
+def convert_video_task(video_id, original_path):
+    instance = Video.objects.get(id=video_id)
+    base_output_dir = original_path.replace('.mp4', '')
+
+    master_path = convert_video_to_hls(original_path, base_output_dir)
+
+    # Pfad relativ zu MEDIA_ROOT setzen
+    relative = Path(master_path).relative_to(
+        Path(instance.video_file.storage.location))
+    instance.video_file.name = str(relative)
+    instance.save(update_fields=["video_file"])
 
 
 def convert_to_height_pixels(source, height_key):
