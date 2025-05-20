@@ -15,7 +15,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 
 # ÜBERGANGSLÖSUNG WEGEN GROßen UPLOADS!
-os.environ["TMPDIR"] = "/mnt/blockstorage/tmp_uploads"
+#os.environ["TMPDIR"] = "/mnt/blockstorage/tmp_uploads"
 
 from pathlib import Path
 from decouple import config
@@ -28,6 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = '/mnt/blockstorage/media'
 MEDIA_URL = '/media/'
 FILE_UPLOAD_TEMP_DIR = '/mnt/blockstorage/tmp_uploads'
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
+FILE_UPLOAD_MAX_MEMORY_SIZE = None
 
 
 # Quick-start development settings - unsuitable for production
