@@ -4,11 +4,18 @@ import ffmpeg
 import shutil
 import os
 from .models import Video
+import logging
+from celery import shared_task
 
 
-# das ist neu für rq
-def convert_video_task(video_id, original_path):
+# CELERY TASK!
+@shared_task
+def convert_video_task(video_id):
+    logging.debug("🚀 Starte ffmpeg-Kommando")
     instance = Video.objects.get(id=video_id)
+    original_path = instance.video_file.path
+    logging.debug(f"📍 Eingabedatei: {original_path}")
+
     base_output_dir = original_path.replace('.mp4', '')
 
     master_path = convert_video_to_hls(original_path, base_output_dir)
@@ -20,43 +27,8 @@ def convert_video_task(video_id, original_path):
     instance.save(update_fields=["video_file"])
 
 
-def convert_to_height_pixels(source, height_key):
-    resolution_map = {
-        '120': '160x120',
-        '360': '640x360',
-        '720': '1280x720',
-        '1080': '1920x1080'
-    }
-
-    if height_key not in resolution_map:
-        print(f"⚠️ Ungültige Auflösung: {height_key}")
-        return
-
-    resolution = resolution_map[height_key]
-    p = Path(source)
-    name = p.stem
-    new_file_name = p.with_name(f"{name}_{height_key}p.mp4")
-
-    cmd = [
-        'ffmpeg',
-        '-i', str(source),
-        '-s', resolution,
-        '-c:v', 'libx264',
-        '-crf', '23',
-        '-c:a', 'aac',
-        '-strict', '-2',
-        str(new_file_name)
-    ]
-
-    run = subprocess.run(cmd, capture_output=True, text=True)
-
-    if run.returncode != 0:
-        print(f"❌ Fehler bei {height_key}p-Konvertierung:", run.stderr)
-    else:
-        print(f"✅ {height_key}p erstellt:", new_file_name)
-
-
 def convert_video_to_hls(source_path: str, output_dir: str):
+    logging.debug(f"🎞 Starte Konvertierung für {source_path}")
     source = Path(source_path)
     base_dir = Path(output_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -78,7 +50,8 @@ def convert_video_to_hls(source_path: str, output_dir: str):
     for label, res in resolutions.items():
         out_path = base_dir / f'video_{label}'
         out_path.mkdir(exist_ok=True)
-        subprocess.run([
+
+        cmd = [
             'ffmpeg', '-i', str(source),
             '-vf', f'scale={res}',
             '-c:v', 'libx264', '-preset', 'fast', '-crf', '23',
@@ -87,7 +60,19 @@ def convert_video_to_hls(source_path: str, output_dir: str):
             '-hls_segment_filename', str(out_path / f'{label}_%03d.ts'),
             '-an',
             str(out_path / 'video.m3u8')
-        ])
+        ]
+
+        try:
+            result = subprocess.run(
+                cmd, check=True, capture_output=True, text=True, timeout=900)
+            if result.returncode != 0:
+                print(f"❌ FFmpeg Fehler ({label}):", result.stderr)
+                raise RuntimeError(f"Fehler bei {label}")
+            else:
+                print(f"✅ Erfolgreich {label} konvertiert.")
+        except subprocess.TimeoutExpired:
+            print(f"⏰ FFmpeg Timeout bei {label}")
+            raise
 
     # 3. Extrahiere Audiospuren
     audio_paths = []
