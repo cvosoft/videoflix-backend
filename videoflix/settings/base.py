@@ -135,3 +135,14 @@ RQ_QUEUES = {
 
 
 CELERY_BROKER_URL = 'redis://:foobared@127.0.0.1:6379/0'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'videoflix',
+        'USER': 'videoflix_user',
+        'PASSWORD': 'holymoly123',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}

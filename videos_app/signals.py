@@ -9,28 +9,6 @@ from .tasks import convert_video_task
 import django_rq
 from django.conf import settings
 
-# # Es werden verschiedene Auflösungen (120p, 360p, 720p, 1080p) zur manuellen Auswahl angeboten.
-# @receiver(post_save, sender=Video)
-# def video_post_save(sender, instance, created, **kwargs):
-#     print('abgespeicher!T')
-#     if created:
-#         print('Neues Video erstellt')
-#         for res in ['120', '360', '720', '1080']:
-#             convert_to_height_pixels(instance.video_file.path, res)
-
-# ALT!
-# @receiver(post_save, sender=Video)
-# def video_post_save(sender, instance, created, **kwargs):
-#     if created and instance.video_file:
-#         base_output_dir = instance.video_file.path.replace('.mp4', '')
-#         master_path = convert_video_to_hls(
-#             instance.video_file.path, base_output_dir)
-#         # Pfad relativ zu MEDIA_ROOT setzen
-#         relative = Path(master_path).relative_to(
-#             Path(instance.video_file.storage.location))
-#         instance.video_file.name = str(relative)
-#         instance.save(update_fields=["video_file"])
-
 
 @receiver(post_save, sender=Video)
 def video_post_save(sender, instance, created, **kwargs):
@@ -45,18 +23,20 @@ def video_post_save(sender, instance, created, **kwargs):
 def video_post_delete(sender, instance, **kwargs):
     if instance.video_file:
         master_path = Path(instance.video_file.path)
-
-        # Nur löschen, wenn master.m3u8 in einem _eigenen_ Unterordner liegt
         hls_directory = master_path.parent
         media_root = Path(settings.MEDIA_ROOT).resolve()
+        videos_root = media_root / 'videos'  # Passe das ggf. an
 
         try:
-            # Stelle sicher, dass der Pfad ein Unterverzeichnis von MEDIA_ROOT ist, aber nicht MEDIA_ROOT selbst
+            # Stelle sicher:
+            # - hls_directory existiert
+            # - hls_directory ist ein Unterverzeichnis von videos_root
+            # - hls_directory ist nicht das gleiche wie videos_root
             if (
                 hls_directory.exists() and
                 hls_directory.is_dir() and
-                media_root in hls_directory.parents and
-                hls_directory != media_root
+                videos_root in hls_directory.parents and
+                hls_directory != videos_root
             ):
                 shutil.rmtree(hls_directory)
                 print(f"✅ HLS-Verzeichnis gelöscht: {hls_directory}")
@@ -65,7 +45,7 @@ def video_post_delete(sender, instance, **kwargs):
         except Exception as e:
             print(f"❌ Fehler beim Löschen des Verzeichnisses: {e}")
 
-        # Original .mp4 löschen (wie bisher)
+        # Original .mp4 löschen
         original_file = Path(instance.video_file.storage.path(
             instance.video_file.name.replace('/master.m3u8', '.mp4')))
         if original_file.exists():
@@ -76,3 +56,15 @@ def video_post_delete(sender, instance, **kwargs):
                 print(f"❌ Fehler beim Löschen der Originaldatei: {e}")
         else:
             print(f"⚠️ Original-Datei nicht gefunden: {original_file}")
+
+    # Thumbnail löschen
+    if instance.thumbnail_file:
+        try:
+            thumb_path = Path(instance.thumbnail_file.path)
+            if thumb_path.exists():
+                thumb_path.unlink()
+                print(f"✅ Thumbnail gelöscht: {thumb_path}")
+            else:
+                print(f"⚠️ Thumbnail nicht gefunden: {thumb_path}")
+        except Exception as e:
+            print(f"❌ Fehler beim Löschen des Thumbnails: {e}")
