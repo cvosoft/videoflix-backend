@@ -2,7 +2,7 @@
 
 from .base import *
 
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['api.predigtflix.de']
 
 MEDIA_ROOT = '/mnt/blockstorage/media'
