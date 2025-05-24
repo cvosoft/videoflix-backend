@@ -1,5 +1,4 @@
 # Videoflix/Predigtflix
-![Logo](logo_coderr.svg)
 
 The [Frontend](https://github.com/cvosoft/videoflix-frontend/) was realized with **Angular v19**,  
 The [Backend](https://github.com/cvosoft/videoflix-backend/) was realized with **Django Rest Framework (DRF)**.
