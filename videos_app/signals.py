@@ -8,6 +8,7 @@ from pathlib import Path
 from .tasks import convert_video_task
 import django_rq
 from django.conf import settings
+from django.db import transaction
 
 
 @receiver(post_save, sender=Video)
@@ -16,7 +17,8 @@ def video_post_save(sender, instance, created, **kwargs):
         # queue = django_rq.get_queue('default')
         # queue.enqueue(convert_video_task, instance.id)
 
-        convert_video_task.delay(instance.id)
+        #convert_video_task.delay(instance.id) - besser:
+        transaction.on_commit(lambda: convert_video_task.delay(instance.id))
 
 
 @receiver(post_delete, sender=Video)
