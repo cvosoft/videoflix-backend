@@ -64,7 +64,7 @@ def convert_video_to_hls(source_path: str, output_dir: str):
 
         try:
             result = subprocess.run(
-                cmd, check=True, capture_output=True, text=True, timeout=900)
+                cmd, check=True, capture_output=True, text=True, timeout=3600)
             if result.returncode != 0:
                 print(f"❌ FFmpeg Fehler ({label}):", result.stderr)
                 raise RuntimeError(f"Fehler bei {label}")
