@@ -1,0 +1,1 @@
+DJANGO_SETTINGS_MODULE=videoflix.settings.dev celery -A videoflix worker -l info
