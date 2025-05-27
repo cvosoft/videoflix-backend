@@ -32,14 +32,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'accounts.MyUser'
 SITE_ID = 1
 
-EMAIL_FROM = config('AUTHEMAIL_DEFAULT_EMAIL_FROM')
-EMAIL_BCC = config('AUTHEMAIL_DEFAULT_EMAIL_BCC', default=None)
-EMAIL_HOST = config('AUTHEMAIL_EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('AUTHEMAIL_EMAIL_PORT', default=587, cast=int)
-EMAIL_HOST_USER = config('AUTHEMAIL_EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('AUTHEMAIL_EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
