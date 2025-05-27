@@ -10,10 +10,7 @@ A REST api written in Django
 
 ## Installation
 * If you wish to run your own build, first ensure you have python globally installed in your computer. If not, you can get python [here](https://www.python.org").
-* After doing this, confirm that you have installed virtualenv globally as well. If not, run this:
-    ```bash
-        $ pip install virtualenv
-    ```
+
 * Then, Git clone this repo to your PC
     ```bash
         $ git clone https://github.com/cvosoft/videoflix-backend.git
@@ -48,6 +45,11 @@ A REST api written in Django
     ```
         http://localhost:8000/api/
     ```
+    For testing the background video processing, you have to run
+    ```
+        DJANGO_SETTINGS_MODULE=videoflix.settings.dev celery -A videoflix worker -l info
+    ```    
+ 
 
 
 ## Links
