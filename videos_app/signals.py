@@ -1,72 +1,63 @@
-from .models import Video
-from .tasks import *
-from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
-import os
 import shutil
 from pathlib import Path
-from .tasks import convert_video_task
-import django_rq
+import logging
+logger = logging.getLogger(__name__)
+
+from django.dispatch import receiver
+from django.db.models.signals import post_save, post_delete
 from django.conf import settings
 from django.db import transaction
+
+from .models import Video
+from .tasks import convert_video_task
+
 
 
 @receiver(post_save, sender=Video)
 def video_post_save(sender, instance, created, **kwargs):
     if created and instance.video_file:
-        # queue = django_rq.get_queue('default')
-        # queue.enqueue(convert_video_task, instance.id)
-
-        #convert_video_task.delay(instance.id) - besser:
         transaction.on_commit(lambda: convert_video_task.delay(instance.id))
 
 
 @receiver(post_delete, sender=Video)
 def video_post_delete(sender, instance, **kwargs):
     if instance.video_file:
-        master_path = Path(instance.video_file.path)
-        hls_directory = master_path.parent
-        media_root = Path(settings.MEDIA_ROOT).resolve()
-        videos_root = media_root / 'videos'  # Passe das ggf. an
+        _delete_hls_directory(instance.video_file)
+        _delete_original_file(instance.video_file)
 
-        try:
-            # Stelle sicher:
-            # - hls_directory existiert
-            # - hls_directory ist ein Unterverzeichnis von videos_root
-            # - hls_directory ist nicht das gleiche wie videos_root
-            if (
-                hls_directory.exists() and
-                hls_directory.is_dir() and
-                videos_root in hls_directory.parents and
-                hls_directory != videos_root
-            ):
-                shutil.rmtree(hls_directory)
-                print(f"✅ HLS-Verzeichnis gelöscht: {hls_directory}")
-            else:
-                print(f"⚠️ Sicheres Löschen abgebrochen: {hls_directory}")
-        except Exception as e:
-            print(f"❌ Fehler beim Löschen des Verzeichnisses: {e}")
 
-        # Original .mp4 löschen
-        original_file = Path(instance.video_file.storage.path(
-            instance.video_file.name.replace('/master.m3u8', '.mp4')))
-        if original_file.exists():
-            try:
-                original_file.unlink()
-                print(f"✅ Original-Datei gelöscht: {original_file}")
-            except Exception as e:
-                print(f"❌ Fehler beim Löschen der Originaldatei: {e}")
+def _delete_hls_directory(video_file):
+    master_path = Path(video_file.path)
+    hls_directory = master_path.parent
+    media_root = Path(settings.MEDIA_ROOT).resolve()
+    videos_root = media_root / 'videos'
+
+    try:
+        if (
+            hls_directory.exists()
+            and hls_directory.is_dir()
+            and videos_root in hls_directory.parents
+            and hls_directory != videos_root
+        ):
+            shutil.rmtree(hls_directory)
+            logger.info(f"HLS-Verzeichnis gelöscht: {hls_directory}")
         else:
-            print(f"⚠️ Original-Datei nicht gefunden: {original_file}")
+            logger.info(f"Sicheres Löschen abgebrochen: {hls_directory}")
+    except Exception as e:
+        logger.error(f"Fehler beim Löschen des Verzeichnisses: {e}")
 
-    # Thumbnail löschen
-    if instance.thumbnail_file:
+
+def _delete_original_file(video_file):
+    original_file_path = video_file.storage.path(
+        video_file.name.replace('/master.m3u8', '.mp4')
+    )
+    original_file = Path(original_file_path)
+
+    if original_file.exists():
         try:
-            thumb_path = Path(instance.thumbnail_file.path)
-            if thumb_path.exists():
-                thumb_path.unlink()
-                print(f"✅ Thumbnail gelöscht: {thumb_path}")
-            else:
-                print(f"⚠️ Thumbnail nicht gefunden: {thumb_path}")
+            original_file.unlink()
+            logger.info(f"Original-Datei gelöscht: {original_file}")
         except Exception as e:
-            print(f"❌ Fehler beim Löschen des Thumbnails: {e}")
+            logger.info(f"Fehler beim Löschen der Originaldatei: {e}")
+    else:
+        logger.error(f"Original-Datei nicht gefunden: {original_file}")

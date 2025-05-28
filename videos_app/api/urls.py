@@ -7,7 +7,6 @@ router = DefaultRouter()
 router.register(r'serien', SerieViewSet, basename='serien')
 router.register(r'predigten', PredigtViewSet, basename='predigten')
 
-
 urlpatterns = [
     path('', include(router.urls)),
 ]
