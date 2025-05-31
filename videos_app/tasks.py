@@ -62,7 +62,7 @@ def _convert_video_resolutions(source: Path, output_dir: Path):
         ]
         try:
             result = subprocess.run(
-                cmd, check=True, capture_output=True, text=True, timeout=3600)
+                cmd, check=True, capture_output=True, text=True, timeout=7200)
             logger.debug(f"✅ {label} konvertiert.")
         except subprocess.CalledProcessError as e:
             logger.error(
@@ -75,29 +75,34 @@ def _convert_video_resolutions(source: Path, output_dir: Path):
 
 def _extract_audio_streams(source: Path, output_dir: Path, audio_count: int) -> list[tuple[str, str]]:
     audio_definitions = [
-        ('de', 0),
-        ('en', 1)
+        ('full', 0),  # Original: Sprecher + Übersetzer
+        ('de', 1),    # Nur Deutsch
+        ('en', 2)     # Nur Englisch
     ]
     audio_paths = []
 
     for lang, index in audio_definitions:
         if index >= audio_count:
+            logger.warning(
+                f"⚠️ Keine Audiospur vorhanden für '{lang}' (Index {index})")
             continue
+
         lang_dir = output_dir / f'audio_{lang}'
         lang_dir.mkdir(exist_ok=True)
         try:
             subprocess.run([
-                'ffmpeg', '-i', str(
-                    source), '-map', f'0:a:{index}', '-c:a', 'aac',
+                'ffmpeg', '-i', str(source),
+                '-map', f'0:a:{index}', '-c:a', 'aac',
                 '-b:a', '128k', '-f', 'hls', '-hls_time', '6', '-hls_playlist_type', 'vod',
                 '-hls_segment_filename', str(lang_dir / f'{lang}_%03d.ts'),
                 str(lang_dir / 'audio.m3u8')
             ], check=True, capture_output=True, text=True)
             audio_paths.append((lang, f'audio_{lang}/audio.m3u8'))
-            logger.debug(f"🔊 Audio-Stream {lang} extrahiert")
+            logger.debug(f"🔊 Audio-Stream {lang} (Index {index}) extrahiert")
         except subprocess.CalledProcessError as e:
             logger.warning(
                 f"⚠️ Fehler beim Extrahieren von Audio {lang}: {e.stderr}", exc_info=True)
+
     return audio_paths
 
 
@@ -110,14 +115,24 @@ def _generate_master_playlist(output_dir: Path, audio_paths: list[tuple[str, str
         '1080p': '1920x1080'
     }
 
+    audio_labels = {
+        'full': ('Original', 'mul'),
+        'de': ('Deutsch', 'de'),
+        'en': ('Englisch', 'en')
+    }
+
     with master_path.open('w') as f:
         f.write('#EXTM3U\n\n')
         for code, path in audio_paths:
+            name, lang = audio_labels.get(code, (code.upper(), code))
+            is_default = 'YES' if code == 'full' else 'NO'
+
             f.write(
-                f'#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="{code.upper()}",'
-                f'LANGUAGE="{code}",DEFAULT={"YES" if code == "de" else "NO"},AUTOSELECT=YES,'
+                f'#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="{name}",'
+                f'LANGUAGE="{lang}",DEFAULT={is_default},AUTOSELECT=YES,'
                 f'URI="{path}"\n'
             )
+
         for label, res in resolutions.items():
             f.write(
                 f'#EXT-X-STREAM-INF:BANDWIDTH=1500000,RESOLUTION={res},CODECS="avc1.64001f",AUDIO="audio"\n'
